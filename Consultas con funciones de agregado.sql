@@ -67,15 +67,20 @@ HAVING MIN(sueldo_base) >= 5000; -- Filtrar niveles muy bajos
 
 -- USO DE MAX()
 -- Mostrar conceptos cuyo pago máximo registrado haya sido superior a $3,190.
-SELECT c.descripcion, c.tipo, dn.id_concepto, MAX(monto) AS pago_alto
+SELECT dn.id_concepto, c.descripcion, c.tipo, MAX(monto) AS pago_alto
 FROM Detalle_Nomina dn
 JOIN Conceptos c ON dn.id_concepto = c.id_concepto
 GROUP BY c.descripcion, c.tipo, dn.id_concepto
 HAVING MAX(monto) > 3190;
 
--- ¿Cuál es el monto más alto pagado por el tipo "Percepción" por empleado?
-SELECT c.tipo, c.descripcion, MAX(DN.monto) AS pago_maximo
+-- Saber el monto maximo que recibio cada empleado por el concepto de pago de "sueldo base" pero que hayan sido mas de $3,150
+SELECT DN.id_empleado, e.nombres, C.descripcion, MAX(DN.monto) AS pago_maximo
 FROM Conceptos C
 JOIN Detalle_Nomina DN ON C.id_concepto = DN.id_concepto
-GROUP BY C.descripcion, c.tipo
-HAVING c.tipo = 'Percepción'
+JOIN Empleados e ON e.id_empleado = dn.id_empleado
+WHERE C.descripcion = 'Sueldo Base'
+GROUP BY DN.id_empleado, C.descripcion, e.nombres
+HAVING MAX(DN.monto) > 3150
+
+-- ejemplo de toda la tabla
+-- select * from Detalle_Nomina where id_concepto = 1
